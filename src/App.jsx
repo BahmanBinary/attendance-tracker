@@ -1,6 +1,15 @@
-import { Button, Empty, FloatButton, Layout, Modal, Table } from "antd";
+import {
+  Button,
+  Empty,
+  FloatButton,
+  Layout,
+  Modal,
+  Popconfirm,
+  Table,
+} from "antd";
 import { AiOutlinePlus, AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { BsFillPersonCheckFill, BsFillPersonPlusFill } from "react-icons/bs";
+import { MdDangerous } from "react-icons/md";
 import CreateEmployee from "./forms/Employee/Create";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import DataBaseContext from "./kit/contexts/DataBase/DataBaseContext";
@@ -89,21 +98,35 @@ function App() {
 
           return (
             <div style={{ direction: "ltr" }}>
-              <Button
-                type="text"
-                icon={
-                  <AiFillDelete
-                    style={{ verticalAlign: "middle" }}
-                    size={iconSize}
-                  />
-                }
-                shape="circle"
-                onClick={() => {
+              <Popconfirm
+                title="حذف کارمند"
+                description="آیا از حذف این کارمند اطمینان دارید؟"
+                onConfirm={() => {
                   deleteEmployee({ rowid: record.rowid });
                   loadEmployees();
                 }}
-                className="delete-button"
-              />
+                okText="بله"
+                cancelText="خیر"
+                okButtonProps={{ danger: true }}
+                icon={
+                  <MdDangerous
+                    color="red"
+                    style={{ verticalAlign: "middle" }}
+                  />
+                }
+              >
+                <Button
+                  type="text"
+                  icon={
+                    <AiFillDelete
+                      style={{ verticalAlign: "middle" }}
+                      size={iconSize}
+                    />
+                  }
+                  shape="circle"
+                  className="delete-button"
+                />
+              </Popconfirm>
               <Button
                 type="text"
                 icon={
