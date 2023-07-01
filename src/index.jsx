@@ -1,23 +1,23 @@
 import "./index.css";
-import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { ConfigProvider } from "antd";
+import Contexts from "./kit/contexts";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
-    <ConfigProvider
-      theme={{
-        token: { fontFamily: "IRANSans" },
-        components: { Layout: { colorBgHeader: "#2196F3" } },
-      }}
-      direction="rtl"
-    >
+  <ConfigProvider
+    theme={{
+      token: { fontFamily: "IRANSans" },
+      components: { Layout: { colorBgHeader: "#2196F3" } },
+    }}
+    direction="rtl"
+  >
+    <Contexts>
       <App />
-    </ConfigProvider>
-  </React.StrictMode>
+    </Contexts>
+  </ConfigProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

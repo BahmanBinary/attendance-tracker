@@ -104,3 +104,21 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.delete-button {
+  color: #555 !important;
+}
+
+.delete-button:hover {
+  color: #ef5350 !important;
+  background-color: rgba(244, 67, 54, 0.06) !important;
+}
+
+.edit-button {
+  color: #555 !important;
+}
+
+.edit-button:hover {
+  color: #42a5f5 !important;
+  background-color: rgb(33, 150, 243, 0.06) !important;
+}
