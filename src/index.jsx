@@ -4,6 +4,16 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { ConfigProvider } from "antd";
 import Contexts from "./kit/contexts";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Employees from "./pages/Employees";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    children: [{ path: "/", element: <Employees /> }],
+  },
+]);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -15,7 +25,7 @@ root.render(
     direction="rtl"
   >
     <Contexts>
-      <App />
+      <RouterProvider router={router} />
     </Contexts>
   </ConfigProvider>
 );

@@ -2,7 +2,7 @@ import { Layout } from "antd";
 import { useContext, useEffect } from "react";
 import DataBaseContext from "./kit/contexts/DataBase/DataBaseContext";
 import { dbState } from "./kit/helpers/database";
-import Employees from "./pages/Employees";
+import { Outlet } from "react-router-dom";
 
 const { Sider, Header, Content, Footer } = Layout;
 
@@ -33,7 +33,7 @@ function App() {
           <h2 style={{ height: "fit-content", lineHeight: "normal" }}>کارا</h2>
         </Header>
         <Content style={{ padding: "25px 50px" }}>
-          <Employees />
+          <Outlet />
         </Content>
         <Footer
           style={{
