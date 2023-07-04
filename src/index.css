@@ -133,3 +133,9 @@ body {
 .ant-layout-sider-trigger .anticon-right {
   transform: rotate(180deg);
 }
+
+:where(.css-dev-only-do-not-override-daamo5).ant-menu-light,
+:where(.css-dev-only-do-not-override-daamo5).ant-menu-light > .ant-menu {
+  color: #555;
+  font-weight: 500;
+}

@@ -47,6 +47,28 @@ export function deleteAttendance(conditions) {
   deleteRecord(conditions, "attendances");
 }
 
+export function insertSetting({ option, value }) {
+  insertRecord(
+    {
+      option,
+      value,
+    },
+    "settings"
+  );
+}
+
+export function selectSetting() {
+  return selectRecord("settings");
+}
+
+export function updateSetting(conditions, data) {
+  updateRecord(conditions, data, "settings");
+}
+
+export function deleteSetting(conditions) {
+  deleteRecord(conditions, "settings");
+}
+
 function insertRecord(data, tableName) {
   const db = dbState.db;
 

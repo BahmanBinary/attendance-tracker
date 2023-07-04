@@ -1,11 +1,14 @@
 import { Layout, Menu } from "antd";
 import { useContext, useEffect } from "react";
 import DataBaseContext from "./kit/contexts/DataBase/DataBaseContext";
-import { dbState } from "./kit/helpers/database";
+import { dbState, selectSetting } from "./kit/helpers/database";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { FaUsers, FaUserCheck } from "react-icons/fa";
+import { AiFillSetting } from "react-icons/ai";
 
 const { Sider, Header, Content, Footer } = Layout;
+
+const menuIconSize = 22;
 
 function App() {
   const navigate = useNavigate();
@@ -18,16 +21,52 @@ function App() {
   useEffect(() => {
     const db = openDatabase("kara", "1.0", "Kara DB", 2 * 1024 * 1024);
 
-    db.transaction(function (tx) {
-      // id int not null primary key,
-      tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS employees (first_name varchar(255), last_name varchar(255), rank varchar(255), service_location varchar(255))"
-      );
+    db.transaction(
+      function (tx) {
+        tx.executeSql(
+          "CREATE TABLE IF NOT EXISTS employees (first_name varchar(255), last_name varchar(255), rank varchar(255), service_location varchar(255))"
+        );
 
-      tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS attendances (entrance datetime, exit datetime, employee_id int, FOREIGN KEY (employee_id) REFERENCES employees (rowid))"
-      );
-    });
+        tx.executeSql(
+          "CREATE TABLE IF NOT EXISTS attendances (entrance datetime, exit datetime, employee_id int, FOREIGN KEY (employee_id) REFERENCES employees (rowid))"
+        );
+
+        tx.executeSql(
+          "CREATE TABLE IF NOT EXISTS settings (option varchar(255), value varchar(255))"
+        );
+
+        selectSetting().then((settings) => {
+          if (!settings.length)
+            db.transaction(
+              function (tx) {
+                const defaultSettings = {
+                  working_hours: [
+                    [96, 192],
+                    [96, 192],
+                    [96, 192],
+                    [96, 192],
+                    [96, 192],
+                    [96, 192],
+                  ],
+                };
+
+                for (const setting of Object.entries(defaultSettings))
+                  tx.executeSql(
+                    `INSERT INTO settings (option,value) VALUES ("${
+                      setting[0]
+                    }",'${JSON.stringify(setting[1])}')`
+                  );
+              },
+              function (error) {
+                console.log(error.message);
+              }
+            );
+        });
+      },
+      function (error) {
+        console.log(error.message);
+      }
+    );
 
     setDB(db);
     dbState.db = db;
@@ -46,7 +85,12 @@ function App() {
           items={[
             {
               key: "/",
-              icon: <FaUsers style={{ verticalAlign: "middle" }} />,
+              icon: (
+                <FaUsers
+                  style={{ verticalAlign: "middle" }}
+                  size={menuIconSize}
+                />
+              ),
               label: "کارمندان",
               onClick() {
                 navigate("/");
@@ -54,10 +98,28 @@ function App() {
             },
             {
               key: "/attendances",
-              icon: <FaUserCheck style={{ verticalAlign: "middle" }} />,
+              icon: (
+                <FaUserCheck
+                  style={{ verticalAlign: "middle" }}
+                  size={menuIconSize}
+                />
+              ),
               label: "حضور غیاب",
               onClick() {
                 navigate("/attendances");
+              },
+            },
+            {
+              key: "/settings",
+              icon: (
+                <AiFillSetting
+                  style={{ verticalAlign: "middle" }}
+                  size={menuIconSize}
+                />
+              ),
+              label: "تنظیمات",
+              onClick() {
+                navigate("/settings");
               },
             },
           ]}
@@ -69,6 +131,8 @@ function App() {
           <h2 style={{ height: "fit-content", lineHeight: "normal" }}>
             {((pathname) => {
               switch (pathname) {
+                case "/settings":
+                  return "تنظیمات";
                 case "/attendances":
                   return "حضور غیاب";
                 default:

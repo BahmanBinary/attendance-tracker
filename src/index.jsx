@@ -11,6 +11,7 @@ import Attendances from "./pages/Attendances";
 import locale from "antd/locale/fa_IR";
 import dayjs from "dayjs";
 import jalaliday from "jalaliday";
+import Settings from "./pages/Settings";
 
 dayjs.extend(jalaliday);
 
@@ -24,6 +25,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <Employees /> },
       { path: "/attendances", element: <Attendances /> },
+      { path: "/settings", element: <Settings /> },
     ],
   },
 ]);
