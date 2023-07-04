@@ -1,6 +1,6 @@
 import { Button, Empty, FloatButton, Modal, Popconfirm, Table } from "antd";
-import { AiOutlinePlus, AiFillDelete, AiFillEdit } from "react-icons/ai";
-import { BsFillPersonCheckFill, BsFillPersonPlusFill } from "react-icons/bs";
+import { AiFillDelete, AiFillEdit } from "react-icons/ai";
+import { BsFillPersonPlusFill } from "react-icons/bs";
 import { MdDangerous } from "react-icons/md";
 import CreateEmployee from "../../forms/Employee/Create";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -132,25 +132,18 @@ function Employees() {
         dataSource={state.employees}
         locale={{ emptyText: <Empty description="داده ای موجود نیست!" /> }}
       />
-      <FloatButton.Group
-        icon={<AiOutlinePlus style={{ verticalAlign: "middle" }} />}
-        trigger="hover"
+      <FloatButton
+        tooltip="ثبت کارمند"
         type="primary"
-      >
-        <FloatButton
-          icon={<BsFillPersonPlusFill style={{ verticalAlign: "middle" }} />}
-          onClick={() =>
-            setState((state) => {
-              state.employeeCreateModal = true;
+        icon={<BsFillPersonPlusFill style={{ verticalAlign: "middle" }} />}
+        onClick={() =>
+          setState((state) => {
+            state.employeeCreateModal = true;
 
-              return { ...state };
-            })
-          }
-        />
-        <FloatButton
-          icon={<BsFillPersonCheckFill style={{ verticalAlign: "middle" }} />}
-        />
-      </FloatButton.Group>
+            return { ...state };
+          })
+        }
+      />
       <Modal
         open={state.employeeCreateModal}
         footer={false}

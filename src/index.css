@@ -122,3 +122,14 @@ body {
   color: #42a5f5 !important;
   background-color: rgb(33, 150, 243, 0.06) !important;
 }
+
+.ant-layout-sider-trigger {
+  height: 42px !important;
+  line-height: 42px !important;
+  background-color: #1a237e !important;
+}
+
+.ant-layout-sider-trigger .anticon-left,
+.ant-layout-sider-trigger .anticon-right {
+  transform: rotate(180deg);
+}

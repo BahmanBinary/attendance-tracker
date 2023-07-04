@@ -24,6 +24,29 @@ export function deleteEmployee(conditions) {
   deleteRecord(conditions, "employees");
 }
 
+export function insertAttendance({ entrance, exit, employeeID }) {
+  insertRecord(
+    {
+      entrance,
+      exit,
+      employee_id: employeeID,
+    },
+    "attendances"
+  );
+}
+
+export function selectAttendance() {
+  return selectRecord("attendances");
+}
+
+export function updateAttendance(conditions, data) {
+  updateRecord(conditions, data, "attendances");
+}
+
+export function deleteAttendance(conditions) {
+  deleteRecord(conditions, "attendances");
+}
+
 function insertRecord(data, tableName) {
   const db = dbState.db;
 
@@ -52,15 +75,17 @@ function insertRecord(data, tableName) {
   });
 }
 
-function selectRecord(tableName) {
+function selectRecord(tableName, condition) {
   const db = dbState.db;
 
-  let queryCondition = `SELECT rowid, * FROM ${tableName}`;
+  let query = `SELECT rowid, * FROM ${tableName}`;
+
+  if (condition) query += ` ${condition}`;
 
   return new Promise((resolve, reject) => {
     db.transaction(function (tx) {
       tx.executeSql(
-        queryCondition,
+        query,
         [],
         function (tx, result) {
           const resultAsArray = [];

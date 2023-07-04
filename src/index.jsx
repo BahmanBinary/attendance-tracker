@@ -1,4 +1,5 @@
 import "./index.css";
+import "dayjs/locale/fa";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
@@ -6,12 +7,24 @@ import { ConfigProvider } from "antd";
 import Contexts from "./kit/contexts";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Employees from "./pages/Employees";
+import Attendances from "./pages/Attendances";
+import locale from "antd/locale/fa_IR";
+import dayjs from "dayjs";
+import jalaliday from "jalaliday";
+
+dayjs.extend(jalaliday);
+
+dayjs.locale("fa");
+dayjs.calendar("jalali");
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-    children: [{ path: "/", element: <Employees /> }],
+    children: [
+      { path: "/", element: <Employees /> },
+      { path: "/attendances", element: <Attendances /> },
+    ],
   },
 ]);
 
@@ -23,6 +36,7 @@ root.render(
       components: { Layout: { colorBgHeader: "#2196F3" } },
     }}
     direction="rtl"
+    locale={locale}
   >
     <Contexts>
       <RouterProvider router={router} />
