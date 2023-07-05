@@ -48,6 +48,7 @@ function App() {
                     [96, 192],
                     [96, 192],
                   ],
+                  holidays: [],
                 };
 
                 for (const setting of Object.entries(defaultSettings))

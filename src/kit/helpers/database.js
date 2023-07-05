@@ -134,7 +134,7 @@ function updateRecord(conditions, data, tableName) {
   for (const itemIndex in dataEntries) {
     const value = dataEntries[itemIndex][1];
     query += `${dataEntries[itemIndex][0]} = ${
-      typeof value === "string" ? `"${value}"` : value
+      typeof value === "string" ? `'${value}'` : value
     }`;
 
     if (itemIndex != dataEntries.length - 1) query += ", ";

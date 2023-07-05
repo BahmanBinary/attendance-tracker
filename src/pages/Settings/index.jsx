@@ -1,6 +1,7 @@
-import { Button, Card, Col, Form, Row, Slider } from "antd";
+import { Button, Card, Col, DatePicker, Form, Row, Slider } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import { selectSetting, updateSetting } from "../../kit/helpers/database";
+import { AiFillCloseCircle } from "react-icons/ai";
 import dayjs from "dayjs";
 
 const weekDays = [
@@ -34,6 +35,13 @@ function Settings() {
           })
         );
 
+        currentState.settings.holidays = currentState.settings.holidays.map(
+          (item) =>
+            dayjs(item, {
+              jalali: true,
+            })
+        );
+
         return { ...currentState };
       })
     );
@@ -50,6 +58,9 @@ function Settings() {
           onFinish={save}
         >
           <Row gutter={10}>
+            <Col span={24}>
+              <h3>ساعات کاری</h3>
+            </Col>
             {new Array(6).fill().map((item, index) => {
               return (
                 <Col key={index} span={24} style={{ marginBottom: 15 }}>
@@ -71,12 +82,71 @@ function Settings() {
                 </Col>
               );
             })}
+          </Row>
+          <Row gutter={10} style={{ marginTop: 30 }}>
+            <Col span={24}>
+              <h3>روزهای تعطیل</h3>
+            </Col>
+            <Form.List name="holidays">
+              {(fields, { add, remove }) => (
+                <>
+                  <Col span={24}>
+                    <Form.Item>
+                      <Button
+                        htmlType="button"
+                        style={{ width: "100%" }}
+                        onClick={() => add()}
+                      >
+                        افزودن
+                      </Button>
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Row gutter={[10, 10]}>
+                      {fields.map((field, index) => (
+                        <Col
+                          span={3}
+                          key={field.key}
+                          style={{
+                            display: "flex",
+                            flexDirection: "row-reverse",
+                          }}
+                        >
+                          <Form.Item name={field.name}>
+                            <DatePicker
+                              style={{ width: "100%", direction: "ltr" }}
+                              format="YYYY/MM/DD"
+                            />
+                          </Form.Item>
+                          <Button
+                            htmlType="button"
+                            type="text"
+                            shape="circle"
+                            icon={
+                              <AiFillCloseCircle
+                                color="#888"
+                                style={{
+                                  verticalAlign: "middle",
+                                }}
+                              />
+                            }
+                            onClick={() => remove(index)}
+                          />
+                        </Col>
+                      ))}
+                    </Row>
+                  </Col>
+                </>
+              )}
+            </Form.List>
+          </Row>
+          <Row gutter={10}>
             <Col span={24}>
               <Form.Item>
                 <Button
                   type="primary"
                   htmlType="submit"
-                  style={{ width: "100%", marginTop: 20 }}
+                  style={{ width: "100%", marginTop: 80 }}
                 >
                   ذخیره
                 </Button>
@@ -92,6 +162,10 @@ function Settings() {
 export default Settings;
 
 function save(values) {
+  values.holidays = values.holidays
+    .filter((item) => item && item.type !== "click")
+    .map((holiday) => holiday.format("YYYY/MM/DD"));
+
   for (const [option, value] of Object.entries(values))
     updateSetting({ option }, { value: JSON.stringify(value) });
 }
