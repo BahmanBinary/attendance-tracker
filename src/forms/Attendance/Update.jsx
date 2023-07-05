@@ -1,4 +1,13 @@
-import { Button, Col, DatePicker, Form, Row, Select } from "antd";
+import {
+  Button,
+  Col,
+  DatePicker,
+  Form,
+  Row,
+  Select,
+  Checkbox,
+  InputNumber,
+} from "antd";
 import { useCallback, useEffect, useState } from "react";
 import { selectEmployee, updateAttendance } from "../../kit/helpers/database";
 import dayjs from "dayjs";
@@ -6,6 +15,8 @@ import dayjs from "dayjs";
 export default function UpdateAttendance({ close, data }) {
   const [state, setState] = useState({
     employees: [],
+    leave: data.leave || false,
+    hourlyLeave: data.leave_type,
   });
 
   useEffect(() => {
@@ -31,14 +42,25 @@ export default function UpdateAttendance({ close, data }) {
 
   const save = useCallback(
     (values) => {
-      updateAttendance(
-        { rowid: data.rowid },
-        {
-          employee_id: values.employee_id,
-          entrance: dayjs(values.entrance).valueOf(),
-          exit: dayjs(values.exit).valueOf(),
+      if (!values.leave) {
+        values.leave_hours = "";
+        values.leave_type = "";
+        values.leave = 0;
+        values.entrance = dayjs(values.entrance).valueOf();
+        values.exit = dayjs(values.exit).valueOf();
+      } else {
+        values.entrance = "";
+        values.exit = "";
+        values.leave = 1;
+        values.leave_type = values.leave_type ? "hourly" : "complete";
+
+        if (!values.leave_hours) {
+          delete values.leave_hours;
+          values.leave_type = "complete";
         }
-      );
+      }
+
+      updateAttendance({ rowid: data.rowid }, values);
       close();
     },
     [data]
@@ -67,32 +89,78 @@ export default function UpdateAttendance({ close, data }) {
             <Select options={state.employees} />
           </Form.Item>
         </Col>
-        <Col span={12}>
-          <Form.Item
-            label="زمان ورود"
-            name="entrance"
-            rules={[{ required: true, message: "ضروری است" }]}
-          >
-            <DatePicker
-              showTime={{ format: "HH:mm" }}
-              style={{ width: "100%" }}
-              disabledDate={(current) => current > dayjs()}
-            />
+        {state.leave || (
+          <>
+            <Col span={12}>
+              <Form.Item
+                label="زمان ورود"
+                name="entrance"
+                rules={[{ required: true, message: "ضروری است" }]}
+              >
+                <DatePicker
+                  showTime={{ format: "HH:mm" }}
+                  style={{ width: "100%" }}
+                  disabledDate={(current) => current > dayjs()}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="زمان خروج"
+                name="exit"
+                rules={[{ required: true, message: "ضروری است" }]}
+              >
+                <DatePicker
+                  showTime={{ format: "HH:mm" }}
+                  style={{ width: "100%" }}
+                  disabledDate={(current) => current > dayjs()}
+                />
+              </Form.Item>
+            </Col>
+          </>
+        )}
+        <Col span={8}>
+          <Form.Item name="leave" valuePropName="checked">
+            <Checkbox
+              onChange={(event) =>
+                setState((currentState) => {
+                  currentState.leave = event.target.checked;
+
+                  return { ...currentState };
+                })
+              }
+            >
+              مرخصی
+            </Checkbox>
           </Form.Item>
         </Col>
-        <Col span={12}>
-          <Form.Item
-            label="زمان خروج"
-            name="exit"
-            rules={[{ required: true, message: "ضروری است" }]}
-          >
-            <DatePicker
-              showTime={{ format: "HH:mm" }}
-              style={{ width: "100%" }}
-              disabledDate={(current) => current > dayjs()}
-            />
-          </Form.Item>
-        </Col>
+        {state.leave && (
+          <>
+            <Col span={8}>
+              <Form.Item name="leave_type" valuePropName="checked">
+                <Checkbox
+                  onChange={(event) =>
+                    setState((currentState) => {
+                      currentState.hourlyLeave = event.target.checked;
+
+                      return { ...currentState };
+                    })
+                  }
+                >
+                  مرخصی ساعتی
+                </Checkbox>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="مقدار مرخصی ساعتی (ساعت)" name="leave_hours">
+                <InputNumber
+                  disabled={!state.hourlyLeave}
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+            </Col>
+          </>
+        )}
         <Col span={24}>
           <Form.Item>
             <Button

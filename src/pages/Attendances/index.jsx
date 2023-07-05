@@ -1,5 +1,5 @@
 import { Button, Empty, FloatButton, Modal, Popconfirm, Table } from "antd";
-import { AiFillDelete, AiFillEdit } from "react-icons/ai";
+import { AiFillDelete, AiFillEdit, AiOutlineCheck } from "react-icons/ai";
 import { BsFillPersonCheckFill } from "react-icons/bs";
 import { MdDangerous } from "react-icons/md";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -18,6 +18,7 @@ function Attendances() {
     attendanceUpdateModal: false,
     attendance: null,
     attendances: [],
+    newRender: 0,
   });
 
   useEffect(() => {
@@ -71,33 +72,52 @@ function Attendances() {
         title: "زمان ورود",
         dataIndex: "entrance",
         key: "entrance",
-        render: (value) => (
-          <span
-            style={{
-              direction: "ltr",
-              unicodeBidi: "plaintext",
-              fontWeight: 500,
-            }}
-          >
-            {dayjs(parseInt(value)).format("YYYY/MM/DD HH:mm")}
-          </span>
-        ),
+        render: (value) =>
+          value && (
+            <span
+              style={{
+                direction: "ltr",
+                unicodeBidi: "plaintext",
+                fontWeight: 500,
+              }}
+            >
+              {dayjs(parseInt(value)).format("YYYY/MM/DD HH:mm")}
+            </span>
+          ),
       },
       {
         title: "زمان خروج",
         dataIndex: "exit",
         key: "exit",
-        render: (value) => (
-          <span
-            style={{
-              direction: "ltr",
-              unicodeBidi: "plaintext",
-              fontWeight: 500,
-            }}
-          >
-            {dayjs(parseInt(value)).format("YYYY/MM/DD HH:mm")}
-          </span>
-        ),
+        render: (value) =>
+          value && (
+            <span
+              style={{
+                direction: "ltr",
+                unicodeBidi: "plaintext",
+                fontWeight: 500,
+              }}
+            >
+              {dayjs(parseInt(value)).format("YYYY/MM/DD HH:mm")}
+            </span>
+          ),
+      },
+      {
+        title: "مرخصی",
+        dataIndex: "leave",
+        key: "leave",
+        render: (value) => (value ? <AiOutlineCheck /> : null),
+      },
+      {
+        title: "نوع مرخصی",
+        dataIndex: "leave_type",
+        key: "leave_type",
+        render: (value) => value && (value === "complete" ? "کامل" : "ساعتی"),
+      },
+      {
+        title: "مقدار مرخصی ساعتی (ساعت)",
+        dataIndex: "leave_hours",
+        key: "leave_hours",
       },
       {
         title: " ",
@@ -147,6 +167,12 @@ function Attendances() {
                 shape="circle"
                 onClick={() => {
                   setState((currentState) => {
+                    record.entrance = record.entrance || Date.now();
+                    record.exit = record.exit || Date.now();
+
+                    record.leave_type =
+                      record.leave_type === "hourly" ? true : false;
+
                     currentState.attendance = record;
                     currentState.attendanceUpdateModal = true;
 
@@ -188,9 +214,15 @@ function Attendances() {
         onCancel={() => closeModal("attendanceCreate")}
       >
         <CreateAttendance
+          key={state.newRender}
           close={() => {
             closeModal("attendanceCreate");
             loadAttendances();
+            setState((currentState) => {
+              currentState.newRender = Date.now();
+
+              return { ...currentState };
+            });
           }}
         />
       </Modal>

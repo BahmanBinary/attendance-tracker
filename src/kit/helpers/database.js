@@ -24,15 +24,8 @@ export function deleteEmployee(conditions) {
   deleteRecord(conditions, "employees");
 }
 
-export function insertAttendance({ entrance, exit, employeeID }) {
-  insertRecord(
-    {
-      entrance,
-      exit,
-      employee_id: employeeID,
-    },
-    "attendances"
-  );
+export function insertAttendance(data) {
+  insertRecord(data, "attendances");
 }
 
 export function selectAttendance() {
@@ -92,9 +85,14 @@ function insertRecord(data, tableName) {
     }
   }
 
-  db.transaction(function (tx) {
-    tx.executeSql(query);
-  });
+  db.transaction(
+    function (tx) {
+      tx.executeSql(query);
+    },
+    function (error) {
+      console.log(error.message);
+    }
+  );
 }
 
 function selectRecord(tableName, condition) {
@@ -152,9 +150,14 @@ function updateRecord(conditions, data, tableName) {
 
   query += queryCondition;
 
-  db.transaction(function (tx) {
-    tx.executeSql(query);
-  });
+  db.transaction(
+    function (tx) {
+      tx.executeSql(query);
+    },
+    function (error) {
+      console.log(error.message);
+    }
+  );
 }
 
 function deleteRecord(conditions, tableName) {
