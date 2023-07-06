@@ -31,6 +31,7 @@ function Employees() {
     employee: null,
     employees: [],
     statisticMonth: dayjs().startOf("M").valueOf(),
+    newRender: 0,
   });
 
   useEffect(() => {
@@ -196,9 +197,7 @@ function Employees() {
         style={{ marginBottom: 25 }}
         bodyStyle={{ display: "flex", flexDirection: "row" }}
       >
-        <span
-          style={{ verticalAlign: "middle", marginLeft: 10, marginTop: 3 }}
-        >
+        <span style={{ verticalAlign: "middle", marginLeft: 10, marginTop: 3 }}>
           انتخاب ماه آماری:
         </span>
         <DatePicker
@@ -239,9 +238,15 @@ function Employees() {
         onCancel={() => closeModal("employeeCreate")}
       >
         <CreateEmployee
+          key={state.newRender}
           close={() => {
             closeModal("employeeCreate");
             loadEmployees();
+            setState((currentState) => {
+              currentState.newRender = Date.now();
+
+              return { ...currentState };
+            });
           }}
         />
       </Modal>
