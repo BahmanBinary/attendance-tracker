@@ -28,7 +28,7 @@ function App() {
         );
 
         tx.executeSql(
-          "CREATE TABLE IF NOT EXISTS attendances (entrance datetime, exit datetime, leave int, leave_type varchar(255), leave_hours int, employee_id int, FOREIGN KEY (employee_id) REFERENCES employees (rowid))"
+          "CREATE TABLE IF NOT EXISTS attendances (entrance datetime, exit datetime, leave int, leave_type varchar(255), leave_hours int, employee_id int, created_at datetime, FOREIGN KEY (employee_id) REFERENCES employees (rowid))"
         );
 
         tx.executeSql(

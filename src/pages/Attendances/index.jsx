@@ -38,7 +38,7 @@ function Attendances() {
         );
 
         setState((currentState) => {
-          currentState.attendances = attendanceResult;
+          currentState.attendances = attendanceResult.reverse();
 
           currentState.attendances = currentState.attendances.map(
             (item, index) => {

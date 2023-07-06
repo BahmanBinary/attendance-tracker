@@ -46,8 +46,8 @@ export default function UpdateAttendance({ close, data }) {
         values.leave_hours = "";
         values.leave_type = "";
         values.leave = 0;
-        values.entrance = dayjs(values.entrance).valueOf();
-        values.exit = dayjs(values.exit).valueOf();
+        values.entrance = dayjs(values.entrance).startOf("m").valueOf();
+        values.exit = dayjs(values.exit).startOf("m").valueOf();
       } else {
         values.entrance = "";
         values.exit = "";

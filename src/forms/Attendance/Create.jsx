@@ -43,6 +43,9 @@ export default function CreateAttendance({ close }) {
   const save = useCallback((values) => {
     if (!values.leave) {
       values.leave = 0;
+
+      values.entrance = dayjs(values.entrance).startOf("m").valueOf();
+      values.exit = dayjs(values.exit).startOf("m").valueOf();
     } else {
       values.leave = 1;
       values.leave_type = values.leave_type ? "hourly" : "complete";
@@ -53,7 +56,7 @@ export default function CreateAttendance({ close }) {
       }
     }
 
-    insertAttendance(values);
+    insertAttendance({ ...values, created_at: dayjs().valueOf() });
     close();
   }, []);
 

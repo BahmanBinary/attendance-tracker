@@ -4,8 +4,16 @@ import { BsFillPersonPlusFill } from "react-icons/bs";
 import { MdDangerous } from "react-icons/md";
 import CreateEmployee from "../../forms/Employee/Create";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { deleteEmployee, selectEmployee } from "../../kit/helpers/database";
+import {
+  deleteAttendance,
+  deleteEmployee,
+  selectAttendance,
+  selectEmployee,
+  selectSetting,
+} from "../../kit/helpers/database";
 import UpdateEmployee from "../../forms/Employee/Update";
+import { employeeDetails } from "../../kit/helpers/calculations";
+import dayjs from "dayjs";
 
 function Employees() {
   const [state, setState] = useState({
@@ -22,19 +30,39 @@ function Employees() {
   }, []);
 
   const loadEmployees = useCallback(() => {
-    selectEmployee().then((result) =>
-      setState((currentState) => {
-        currentState.employees = result;
+    selectEmployee().then((employeeResult) =>
+      selectAttendance().then((attendanceResult) =>
+        selectSetting().then((settingResult) => {
+          const settings = Object.fromEntries(
+            settingResult.map((item) => [item.option, JSON.parse(item.value)])
+          );
 
-        currentState.employees = currentState.employees.map((item, index) => {
-          item.row = index + 1;
-          item.key = item.rowid;
+          const attendances = attendanceResult.filter(
+            (attendance) =>
+              attendance.created_at >= dayjs().startOf("M").valueOf()
+          );
+          const details = employeeDetails(
+            employeeResult,
+            attendances,
+            settings
+          );
 
-          return item;
-        });
+          setState((currentState) => {
+            currentState.employees = employeeResult;
 
-        return { ...currentState };
-      })
+            currentState.employees = currentState.employees.map(
+              (item, index) => {
+                item.row = index + 1;
+                item.key = item.rowid;
+
+                return { ...item, ...details[item.rowid] };
+              }
+            );
+
+            return { ...currentState };
+          });
+        })
+      )
     );
   }, []);
 
@@ -62,6 +90,26 @@ function Employees() {
         key: "serviceLocation",
       },
       {
+        title: "اضافه کار (دقیقه)",
+        dataIndex: "overtime",
+        key: "overtime",
+      },
+      {
+        title: "تاخیر (دقیقه)",
+        dataIndex: "delay",
+        key: "delay",
+      },
+      {
+        title: "مرخصی روزانه (روز)",
+        dataIndex: "complete_leaves",
+        key: "complete_leaves",
+      },
+      {
+        title: "مرخصی ساعتی (ساعت)",
+        dataIndex: "hourly_leaves",
+        key: "hourly_leaves",
+      },
+      {
         title: " ",
         key: "actions",
         render: (value, record, index) => {
@@ -74,6 +122,7 @@ function Employees() {
                 description="آیا از حذف این کارمند اطمینان دارید؟"
                 onConfirm={() => {
                   deleteEmployee({ rowid: record.rowid });
+                  deleteAttendance({ employee_id: record.rowid });
                   loadEmployees();
                 }}
                 okText="بله"

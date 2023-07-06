@@ -10,10 +10,12 @@ import Employees from "./pages/Employees";
 import Attendances from "./pages/Attendances";
 import locale from "antd/locale/fa_IR";
 import dayjs from "dayjs";
+import weekday from "dayjs/plugin/weekday";
 import jalaliday from "jalaliday";
 import Settings from "./pages/Settings";
 
 dayjs.extend(jalaliday);
+dayjs.extend(weekday);
 
 dayjs.locale("fa");
 dayjs.calendar("jalali");
