@@ -105,7 +105,7 @@ function Settings() {
                     <Row gutter={[10, 10]}>
                       {fields.map((field, index) => (
                         <Col
-                          span={3}
+                          span={4}
                           key={field.key}
                           style={{
                             display: "flex",

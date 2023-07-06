@@ -1,4 +1,13 @@
-import { Button, Empty, FloatButton, Modal, Popconfirm, Table } from "antd";
+import {
+  Button,
+  Card,
+  DatePicker,
+  Empty,
+  FloatButton,
+  Modal,
+  Popconfirm,
+  Table,
+} from "antd";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { BsFillPersonPlusFill } from "react-icons/bs";
 import { MdDangerous } from "react-icons/md";
@@ -21,13 +30,14 @@ function Employees() {
     employeeUpdateModal: false,
     employee: null,
     employees: [],
+    statisticMonth: dayjs().startOf("M").valueOf(),
   });
 
   useEffect(() => {
     setTimeout(() => {
       loadEmployees();
     });
-  }, []);
+  }, [state.statisticMonth]);
 
   const loadEmployees = useCallback(() => {
     selectEmployee().then((employeeResult) =>
@@ -37,17 +47,19 @@ function Employees() {
             settingResult.map((item) => [item.option, JSON.parse(item.value)])
           );
 
-          const attendances = attendanceResult.filter(
-            (attendance) =>
-              attendance.created_at >= dayjs().startOf("M").valueOf()
-          );
-          const details = employeeDetails(
-            employeeResult,
-            attendances,
-            settings
-          );
-
           setState((currentState) => {
+            const attendances = attendanceResult.filter(
+              (attendance) =>
+                attendance.created_at >= currentState.statisticMonth &&
+                attendance.created_at <=
+                  dayjs(currentState.statisticMonth).endOf("M").valueOf()
+            );
+            const details = employeeDetails(
+              employeeResult,
+              attendances,
+              settings
+            );
+
             currentState.employees = employeeResult;
 
             currentState.employees = currentState.employees.map(
@@ -93,21 +105,25 @@ function Employees() {
         title: "اضافه کار (دقیقه)",
         dataIndex: "overtime",
         key: "overtime",
+        render: (value) => value ?? 0,
       },
       {
         title: "تاخیر (دقیقه)",
         dataIndex: "delay",
         key: "delay",
+        render: (value) => value ?? 0,
       },
       {
         title: "مرخصی روزانه (روز)",
         dataIndex: "complete_leaves",
         key: "complete_leaves",
+        render: (value) => value ?? 0,
       },
       {
         title: "مرخصی ساعتی (ساعت)",
         dataIndex: "hourly_leaves",
         key: "hourly_leaves",
+        render: (value) => value ?? 0,
       },
       {
         title: " ",
@@ -176,6 +192,30 @@ function Employees() {
 
   return (
     <>
+      <Card
+        style={{ marginBottom: 25 }}
+        bodyStyle={{ display: "flex", flexDirection: "row" }}
+      >
+        <span
+          style={{ verticalAlign: "middle", marginLeft: 10, marginTop: 3 }}
+        >
+          انتخاب ماه آماری:
+        </span>
+        <DatePicker
+          style={{ direction: "ltr" }}
+          disabledDate={(current) => current > dayjs()}
+          format="YYYY/MM"
+          picker="month"
+          onChange={(value) =>
+            setState((currentState) => {
+              currentState.statisticMonth = value.startOf("M").valueOf();
+
+              return { ...currentState };
+            })
+          }
+          value={dayjs(state.statisticMonth)}
+        />
+      </Card>
       <Table
         columns={columns}
         dataSource={state.employees}
