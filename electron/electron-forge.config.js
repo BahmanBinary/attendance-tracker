@@ -15,6 +15,13 @@ module.exports = {
   },
   makers: [
     {
+      name: "@electron-forge/maker-squirrel",
+      config: {
+        name: "kara_app",
+        setupIcon: "assets/images/icons/logo.ico",
+      },
+    },
+    {
       name: "@electron-forge/maker-dmg",
       config: {
         icon: "assets/images/icons/logo.icns",
