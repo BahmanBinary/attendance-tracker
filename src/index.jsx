@@ -5,7 +5,11 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { ConfigProvider } from "antd";
 import Contexts from "./kit/contexts";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  createHashRouter,
+  RouterProvider,
+} from "react-router-dom";
 import Employees from "./pages/Employees";
 import Attendances from "./pages/Attendances";
 import locale from "antd/locale/fa_IR";
@@ -20,7 +24,7 @@ dayjs.extend(weekday);
 dayjs.locale("fa");
 dayjs.calendar("jalali");
 
-const router = createBrowserRouter([
+const routes = [
   {
     path: "/",
     element: <App />,
@@ -30,7 +34,12 @@ const router = createBrowserRouter([
       { path: "/settings", element: <Settings /> },
     ],
   },
-]);
+];
+
+const router =
+  process.env.REACT_APP_TYPE === "electron"
+    ? createHashRouter(routes)
+    : createBrowserRouter(routes);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
