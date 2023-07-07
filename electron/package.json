@@ -1,0 +1,33 @@
+{
+  "name": "Kara",
+  "productName": "Kara",
+  "version": "1.0.0",
+  "description": "Kara Desktop App",
+  "main": "main.js",
+  "author": "Bahman Binary",
+  "private": true,
+  "homepage": "./",
+  "config": {
+    "forge": "electron-forge.config.js"
+  },
+  "scripts": {
+    "package:electron": "rm -rdf out && npm run build:react:electron && electron-forge package",
+    "package:electron:windows": "(if exist out rmdir /s /q out) && npm run build:react:electron:windows && electron-forge package",
+    "build:react": "rm -rdf build && cd .. && BUILD_PATH=electron/build npm run build:react && cd electron",
+    "build:react:windows": "(if exist build rmdir /s /q build) && cd .. && set \"BUILD_PATH=electron/build\" && npm run build:react:windows && cd electron",
+    "build:react:electron": "REACT_APP_TYPE=electron npm run build:react",
+    "build:react:electron:windows": "set \"REACT_APP_TYPE=electron\" && npm run build:react:windows",
+    "build:electron": "rm -rdf out && npm run build:react:electron && electron-forge make",
+    "build:electron:windows": "(if exist out rmdir /s /q out) && npm run build:react:electron:windows && electron-builder -c ./electron-builder.config.js build"
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.4",
+    "@electron-forge/maker-deb": "^6.0.4",
+    "@electron-forge/maker-dmg": "^6.0.4",
+    "electron": "^22.0.0",
+    "electron-builder": "^23.6.0"
+  }
+}

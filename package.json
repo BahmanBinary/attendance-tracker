@@ -1,7 +1,12 @@
 {
-  "name": "attendance-tracker",
+  "name": "Kara",
+  "productName": "Kara",
+  "description": "Kara Desktop App",
+  "author": "Bahman Binary",
   "version": "0.1.0",
   "private": true,
+  "main": "electron/main.js",
+  "homepage": "./",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
@@ -19,10 +24,26 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "clean": "rm -rdf node_modules electron/node_modules",
+    "clean:windows": "(if exist node_modules rmdir /s /q node_modules) && (if exist electron\\node_modules rmdir /s /q electron\\node_modules)",
+    "install:react": "npm install",
+    "install:electron": "cd electron && npm install && cd ..",
+    "install:all": "npm run install:react && npm run install:electron",
+    "install:clean": "npm run clean && npm run install:all",
+    "install:clean:windows": "npm run clean:windows && npm run install:all",
+    "start:react": "react-scripts start",
+    "start:electron": "concurrently -k 'BROWSER=none npm run start:react' 'wait-on tcp:3000 && cd electron && ELECTRON_MODE=dev npx electron-forge start && cd ..'",
+    "start:electron:windows": "concurrently -k \"set BROWSER=none&& npm run start:react\" \"wait-on tcp:127.0.0.1:3000&& cd electron&& set ELECTRON_MODE=dev&& npx electron-forge start&& cd ..\"",
+    "package:electron": "cd electron && npm run package:electron && cd ..",
+    "package:electron:windows": "cd electron && npm run package:electron:windows && cd ..",
+    "build:react": "rm -rdf build && GENERATE_SOURCEMAP=false react-scripts --max-old-space-size=4096 build",
+    "build:react:windows": "(if exist build rmdir /s /q build) && set \"GENERATE_SOURCEMAP=false\" && react-scripts --max-old-space-size=4096 build",
+    "build:react:electron": "REACT_APP_TYPE=electron npm run build:react",
+    "build:react:electron:windows": "set \"REACT_APP_TYPE=electron\" && npm run build:react:windows",
+    "build:electron": "cd electron && npm run build:electron && cd ..",
+    "build:electron:windows": "cd electron && npm run build:electron:windows && cd ..",
+    "test:react": "react-scripts test",
+    "eject:react": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -41,5 +62,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "wait-on": "^7.0.1"
   }
 }
