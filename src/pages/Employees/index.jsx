@@ -31,6 +31,7 @@ function Employees() {
     employee: null,
     employees: [],
     statisticMonth: dayjs().startOf("M").valueOf(),
+    statisticMonthHolidays: 0,
     newRender: 0,
   });
 
@@ -49,6 +50,13 @@ function Employees() {
           );
 
           setState((currentState) => {
+            settings.holidays = settings.holidays.filter(
+              (date) =>
+                dayjs(date, { jalali: true }).format("YYYY/MM") ===
+                dayjs(currentState.statisticMonth).format("YYYY/MM")
+            );
+            currentState.statisticMonthHolidays = settings.holidays.length;
+
             const attendances = attendanceResult.filter(
               (attendance) =>
                 attendance.created_at >= currentState.statisticMonth &&
@@ -195,25 +203,39 @@ function Employees() {
     <>
       <Card
         style={{ marginBottom: 25 }}
-        bodyStyle={{ display: "flex", flexDirection: "row" }}
+        bodyStyle={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+        }}
       >
-        <span style={{ verticalAlign: "middle", marginLeft: 10, marginTop: 3 }}>
-          انتخاب ماه آماری:
-        </span>
-        <DatePicker
-          style={{ direction: "ltr" }}
-          disabledDate={(current) => current > dayjs()}
-          format="YYYY/MM"
-          picker="month"
-          onChange={(value) =>
-            setState((currentState) => {
-              currentState.statisticMonth = value.startOf("M").valueOf();
+        <div style={{ marginLeft: 50 }}>
+          <span style={{ verticalAlign: "middle", marginLeft: 10 }}>
+            انتخاب ماه آماری:
+          </span>
+          <DatePicker
+            style={{ direction: "ltr" }}
+            disabledDate={(current) => current > dayjs()}
+            format="YYYY/MM"
+            picker="month"
+            onChange={(value) =>
+              setState((currentState) => {
+                currentState.statisticMonth = value.startOf("M").valueOf();
 
-              return { ...currentState };
-            })
-          }
-          value={dayjs(state.statisticMonth)}
-        />
+                return { ...currentState };
+              })
+            }
+            value={dayjs(state.statisticMonth)}
+          />
+        </div>
+        <div>
+          <span style={{ verticalAlign: "middle", marginLeft: 10 }}>
+            تعداد تعطیلات ماه آماری:
+          </span>
+          <span style={{ verticalAlign: "middle" }}>
+            {state.statisticMonthHolidays}
+          </span>
+        </div>
       </Card>
       <Table
         columns={columns}

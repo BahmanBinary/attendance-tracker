@@ -115,6 +115,7 @@ function Settings() {
                           <Form.Item name={field.name}>
                             <DatePicker
                               style={{ width: "100%", direction: "ltr" }}
+                              popupStyle={{ zIndex: 9999 }}
                               format="YYYY/MM/DD"
                             />
                           </Form.Item>
