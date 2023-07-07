@@ -45,7 +45,7 @@ function calculateNonWorkingTimes(attendances, settings) {
       else nonWorkingTimes.complete_leaves += 1;
     else {
       const entrance = dayjs(attendance.entrance);
-      const exit = dayjs(attendance.exit);
+      const exit = attendance.exit ? dayjs(attendance.exit) : null;
 
       const entranceWeekDay = entrance.weekday();
 
@@ -53,13 +53,13 @@ function calculateNonWorkingTimes(attendances, settings) {
         entranceWeekDay === 6 ||
         holidays.some((date) => date === entrance.format("YYYY/MM/DD"))
       )
-        nonWorkingTimes.overtime += exit.diff(entrance, "m");
+        nonWorkingTimes.overtime += exit ? exit.diff(entrance, "m") : 0;
       else {
         const formalStart5m = working_hours[entranceWeekDay][0];
         const formalEnd5m = working_hours[entranceWeekDay][1];
 
         const formalWorkTime = (formalEnd5m - formalStart5m) * 5;
-        const workedTime = exit.diff(entrance, "m");
+        const workedTime = exit ? exit.diff(entrance, "m") : 0;
 
         const difference = workedTime - formalWorkTime;
         if (difference > 0) nonWorkingTimes.overtime += difference;

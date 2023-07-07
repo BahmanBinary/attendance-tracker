@@ -45,7 +45,9 @@ export default function CreateAttendance({ close }) {
       values.leave = 0;
 
       values.entrance = dayjs(values.entrance).startOf("m").valueOf();
-      values.exit = dayjs(values.exit).startOf("m").valueOf();
+      values.exit = values.exit
+        ? dayjs(values.exit).startOf("m").valueOf()
+        : "";
     } else {
       values.leave = 1;
       values.leave_type = values.leave_type ? "hourly" : "complete";
@@ -89,11 +91,7 @@ export default function CreateAttendance({ close }) {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                label="زمان خروج"
-                name="exit"
-                rules={[{ required: true, message: "ضروری است" }]}
-              >
+              <Form.Item label="زمان خروج" name="exit">
                 <DatePicker
                   showTime={{ format: "HH:mm" }}
                   style={{ width: "100%", direction: "ltr" }}
