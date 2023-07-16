@@ -1,11 +1,14 @@
 import {
   Button,
   Card,
+  Col,
   DatePicker,
   Empty,
   FloatButton,
+  Input,
   Modal,
   Popconfirm,
+  Row,
   Table,
 } from "antd";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
@@ -24,22 +27,29 @@ import UpdateEmployee from "../../forms/Employee/Update";
 import { employeeDetails } from "../../kit/helpers/calculations";
 import dayjs from "dayjs";
 
+const { RangePicker } = DatePicker;
+
 function Employees() {
   const [state, setState] = useState({
     employeeCreateModal: false,
     employeeUpdateModal: false,
     employee: null,
     employees: [],
-    statisticMonth: dayjs().startOf("M").valueOf(),
+    statisticRange: [
+      dayjs().startOf("M").startOf("d").valueOf(),
+      dayjs().valueOf(),
+    ],
     statisticMonthHolidays: 0,
     newRender: 0,
+    firstName: "",
+    lastName: "",
   });
 
   useEffect(() => {
     setTimeout(() => {
       loadEmployees();
     });
-  }, [state.statisticMonth]);
+  }, [state.statisticRange, state.firstName, state.lastName]);
 
   const loadEmployees = useCallback(() => {
     selectEmployee().then((employeeResult) =>
@@ -52,16 +62,17 @@ function Employees() {
           setState((currentState) => {
             settings.holidays = settings.holidays.filter(
               (date) =>
-                dayjs(date, { jalali: true }).format("YYYY/MM") ===
-                dayjs(currentState.statisticMonth).format("YYYY/MM")
+                dayjs(date, { jalali: true }).valueOf() >=
+                  dayjs(currentState.statisticRange[0]).valueOf() &&
+                dayjs(date, { jalali: true }).valueOf() <=
+                  dayjs(currentState.statisticRange[1]).valueOf()
             );
             currentState.statisticMonthHolidays = settings.holidays.length;
 
             const attendances = attendanceResult.filter(
               (attendance) =>
-                attendance.created_at >= currentState.statisticMonth &&
-                attendance.created_at <=
-                  dayjs(currentState.statisticMonth).endOf("M").valueOf()
+                attendance.entrance >= currentState.statisticRange[0] &&
+                attendance.entrance <= currentState.statisticRange[1]
             );
             const details = employeeDetails(
               employeeResult,
@@ -69,7 +80,23 @@ function Employees() {
               settings
             );
 
-            currentState.employees = employeeResult;
+            if (currentState.firstName || currentState.lastName)
+              currentState.employees = employeeResult.filter(
+                (employee) =>
+                  (currentState.firstName !== "" &&
+                  !employee.first_name
+                    .toLowerCase()
+                    .includes(currentState.firstName.toLowerCase())
+                    ? false
+                    : true) &&
+                  (currentState.lastName !== "" &&
+                  !employee.last_name
+                    .toLowerCase()
+                    .includes(currentState.lastName.toLowerCase())
+                    ? false
+                    : true)
+              );
+            else currentState.employees = employeeResult;
 
             currentState.employees = currentState.employees.map(
               (item, index) => {
@@ -201,41 +228,87 @@ function Employees() {
 
   return (
     <>
-      <Card
-        style={{ marginBottom: 25 }}
-        bodyStyle={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-        }}
-      >
-        <div style={{ marginLeft: 50 }}>
-          <span style={{ verticalAlign: "middle", marginLeft: 10 }}>
-            انتخاب ماه آماری:
-          </span>
-          <DatePicker
-            style={{ direction: "ltr" }}
-            disabledDate={(current) => current > dayjs()}
-            format="YYYY/MM"
-            picker="month"
-            onChange={(value) =>
-              setState((currentState) => {
-                currentState.statisticMonth = value.startOf("M").valueOf();
+      <Card style={{ marginBottom: 25 }}>
+        <Row gutter={[20, 20]}>
+          <Col span={6} style={{ display: "flex", alignItems: "center" }}>
+            <span style={{ verticalAlign: "middle", marginLeft: 10 }}>
+              نام:
+            </span>
+            <Input
+              onChange={(event) =>
+                setState((currentState) => {
+                  currentState.firstName = event.target.value;
 
-                return { ...currentState };
-              })
-            }
-            value={dayjs(state.statisticMonth)}
-          />
-        </div>
-        <div>
-          <span style={{ verticalAlign: "middle", marginLeft: 10 }}>
-            تعداد تعطیلات ماه آماری:
-          </span>
-          <span style={{ verticalAlign: "middle" }}>
-            {state.statisticMonthHolidays}
-          </span>
-        </div>
+                  return { ...currentState };
+                })
+              }
+              value={state.firstName}
+            />
+          </Col>
+          <Col span={8} style={{ display: "flex", alignItems: "center" }}>
+            <span
+              style={{
+                verticalAlign: "middle",
+                marginLeft: 10,
+                whiteSpace: "nowrap",
+              }}
+            >
+              نام خانوادگی:
+            </span>
+            <Input
+              onChange={(event) =>
+                setState((currentState) => {
+                  currentState.lastName = event.target.value;
+
+                  return { ...currentState };
+                })
+              }
+              value={state.lastName}
+            />
+          </Col>
+          <Col span={10}>
+            <span
+              style={{
+                verticalAlign: "middle",
+                marginLeft: 10,
+                whiteSpace: "nowrap",
+              }}
+            >
+              انتخاب بازه آماری:
+            </span>
+            <RangePicker
+              style={{ direction: "ltr" }}
+              disabledDate={(current) => current > dayjs()}
+              onChange={(value) =>
+                setState((currentState) => {
+                  currentState.statisticRange = value
+                    ? [
+                        value[0].startOf("d").valueOf(),
+                        value[1].endOf("d").valueOf(),
+                      ]
+                    : [
+                        dayjs().startOf("M").startOf("d").valueOf(),
+                        dayjs().valueOf(),
+                      ];
+
+                  return { ...currentState };
+                })
+              }
+              value={[
+                dayjs(state.statisticRange[0]),
+                dayjs(state.statisticRange[1]),
+              ]}
+            />
+          </Col>
+          <Col span={12}>
+            <span style={{ verticalAlign: "middle", marginLeft: 10 }}>
+              تعداد تعطیلات بازه آماری:
+            </span>
+            <span style={{ verticalAlign: "middle" }}>
+              {state.statisticMonthHolidays}
+            </span>
+          </Col>
+        </Row>
       </Card>
       <Table
         columns={columns}
